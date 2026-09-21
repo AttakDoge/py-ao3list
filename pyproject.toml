@@ -23,4 +23,4 @@ Homepage = "https://github.com/AttakDoge/py-ao3list"
 Issues = "https://github.com/AttakDoge/py-ao3list/issues"
 
 [tool.setuptools.package-data]
-'src' = ['*.json']
+"" = ["*.json"]
