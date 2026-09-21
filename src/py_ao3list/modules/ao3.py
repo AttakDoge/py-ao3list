@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests as rq
 from fake_useragent import UserAgent
 from datetime import datetime
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Any
 from platformdirs import user_config_dir, user_data_dir
 import os
 import json
@@ -10,11 +10,13 @@ from pathlib import Path
 from importlib import resources
 
 CONFIG_DIR = user_config_dir("py-ao3list", "AttakDoge")
+data_file = None
 
 def sayhi():
     print("ao3")
 
 def init() -> None:
+    global data_file
     os.makedirs(CONFIG_DIR, exist_ok=True)
     config_file = Path(os.path.join(CONFIG_DIR, "config.json"))
     if not config_file.exists():
@@ -27,11 +29,28 @@ def init() -> None:
             default_data = default_config.read_text(encoding="utf-8")
             config_file.write_text(default_data, encoding="utf-8")
     print(CONFIG_DIR)
+
     with open(config_file, "r", encoding="utf-8") as f:
         config = json.load(f)
         data_dir = config["data-directory"]
     print(data_dir)
+
+    if data_dir == "default":
+        data_dir = user_data_dir("py-ao3list", "AttakDoge")
+        print(data_dir)
+    data_file = Path(os.path.join(data_dir, "works.json"))
+    if not data_file.exists():
+        config_file.write_text("{}", encoding="utf-8")
     
+    with open(data_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    print(data)
+    
+def load_data() -> Any:
+    global data_file
+    with open(data_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
 
 def get_ao3(work:str, to_get:Optional[List[int]] = None) -> Tuple[List, List[int]]:
     if to_get is None:
@@ -44,7 +63,7 @@ def get_ao3(work:str, to_get:Optional[List[int]] = None) -> Tuple[List, List[int
         except Exception as e:
             print(f"The input \"{work}\" was not detected to be an acceptable link or work ID. Error:")
             raise
-    link = f"https://archiveofourown.org/works/{work_id}"
+    link = f"https://archiveofourown.org/works/{work_id}?view_adult=true"
     work_request = rq.get(link, headers={'User-Agent':str(UserAgent().chrome) + "(py-ao3listBot/1.0; +https://github.com/AttakDoge/py-ao3list)"})
     work_contents = BeautifulSoup(work_request.content, "html.parser")
     #print(work_contents)
