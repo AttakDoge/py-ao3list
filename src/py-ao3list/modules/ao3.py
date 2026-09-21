@@ -3,9 +3,34 @@ import requests as rq
 from fake_useragent import UserAgent
 from datetime import datetime
 from typing import Tuple, List, Optional
+from platformdirs import user_config_dir, user_data_dir
+import os
+import json
+from pathlib import Path
+from importlib import resources
+
+CONFIG_DIR = user_config_dir("py-ao3list", "AttakDoge")
 
 def sayhi():
     print("ao3")
+
+def init() -> None:
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+    config_file = Path(os.path.join(CONFIG_DIR, "config.json"))
+    if not config_file.exists():
+        try:
+            default_config = resources.files("py-ao3list").joinpath("default-config.json")
+            default_data = default_config.read_text(encoding="utf-8")
+            config_file.write_text(default_data, encoding="utf-8")
+        except ModuleNotFoundError:
+            default_config = resources.files("py-ao3list").joinpath("default-config.json")
+            default_data = default_config.read_text(encoding="utf-8")
+            config_file.write_text(default_data, encoding="utf-8")
+    print(CONFIG_DIR)
+    #with open(config_file, "r", encoding="utf-8") as f:
+    #    config = json.load()
+    #    data_dir = config["data-directory"]
+    
 
 def get_ao3(work:str, to_get:Optional[List[int]] = None) -> Tuple[List, List[int]]:
     if to_get is None:
@@ -19,7 +44,7 @@ def get_ao3(work:str, to_get:Optional[List[int]] = None) -> Tuple[List, List[int
             print(f"The input \"{work}\" was not detected to be an acceptable link or work ID. Error:")
             raise
     link = f"https://archiveofourown.org/works/{work_id}"
-    work_request = rq.get(link, headers={'User-Agent':str(UserAgent().chrome)})
+    work_request = rq.get(link, headers={'User-Agent':str(UserAgent().chrome) + "(py-ao3listBot/1.0; +https://github.com/AttakDoge/py-ao3list)"})
     work_contents = BeautifulSoup(work_request.content, "html.parser")
     #print(work_contents)
 
@@ -79,6 +104,6 @@ def get_ao3(work:str, to_get:Optional[List[int]] = None) -> Tuple[List, List[int
     
 
 
-results, errors = get_ao3("https://archiveofourown.org/works/37004083/chapters/92324395", [1, 0, 1, 0, 1])
-print(results)
-print(errors)
+#results, errors = get_ao3("https://archiveofourown.org/works/37004083/chapters/92324395")
+#print(results)
+#print(errors)
