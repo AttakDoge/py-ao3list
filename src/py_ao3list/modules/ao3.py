@@ -19,17 +19,18 @@ def init() -> None:
     config_file = Path(os.path.join(CONFIG_DIR, "config.json"))
     if not config_file.exists():
         try:
-            default_config = resources.files("py-ao3list").joinpath("default-config.json")
+            default_config = resources.files("py_ao3list").joinpath("default-config.json")
             default_data = default_config.read_text(encoding="utf-8")
             config_file.write_text(default_data, encoding="utf-8")
-        except ModuleNotFoundError:
-            default_config = resources.files("py-ao3list").joinpath("default-config.json")
+        except ModuleNotFoundError: # isn't this redundant?
+            default_config = resources.files("py_ao3list").joinpath("default-config.json")
             default_data = default_config.read_text(encoding="utf-8")
             config_file.write_text(default_data, encoding="utf-8")
     print(CONFIG_DIR)
-    #with open(config_file, "r", encoding="utf-8") as f:
-    #    config = json.load()
-    #    data_dir = config["data-directory"]
+    with open(config_file, "r", encoding="utf-8") as f:
+        config = json.load(f)
+        data_dir = config["data-directory"]
+    print(data_dir)
     
 
 def get_ao3(work:str, to_get:Optional[List[int]] = None) -> Tuple[List, List[int]]:

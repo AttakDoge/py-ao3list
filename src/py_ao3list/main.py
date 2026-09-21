@@ -1,5 +1,5 @@
 import argparse
-from modules import ao3
+from py_ao3list.modules import ao3
 
 def main():
     #ao3.sayhi()
