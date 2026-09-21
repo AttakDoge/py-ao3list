@@ -18,6 +18,9 @@ classifiers = [
     "Natural Language :: English"
 ]
 
+[project.scripts]
+py-ao3list = "py_ao3list.main:main"
+
 [project.urls]
 Homepage = "https://github.com/AttakDoge/py-ao3list"
 Issues = "https://github.com/AttakDoge/py-ao3list/issues"
